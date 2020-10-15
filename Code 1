@@ -1,0 +1,62 @@
+% Code 1 for Needle Tumors 
+% This code asks the user which experiment they would like to process and
+% consequently loads all of the data from that experiment 
+% The code consequently creates performs the tumor segmentation, outputting
+% segmentations of individual invasions, the maximum area threshold image,
+% and the needle tumor periphery. The distance between the cavity and the
+% tumor is also calculated
+input = [];
+outputfolder = uigetdir('C:\Users\Owner\OneDrive\Desktop\Stoll Fellowship Code\','Where would you like to store the converted data?');% Enter output folder
+prompt = 'What name handle would you like to use? (s(number).mat will be added automatically)\\n (enter inside single quotes)\\n';
+dlgtitle = 'Name Handle';
+dims = [1 40];
+out = inputdlg(prompt, dlgtitle, dims);
+
+prompt = {' What experiment would you like to process? '}; % Enter ExpID
+dlgtitle = 'Select Experiment';
+dims = [1 40];
+ExpID_ = string(inputdlg(prompt, dlgtitle, dims));
+
+prompt = {' How many images would you like to process? '}; % Enter ExpID
+dlgtitle = 'Number of Images';
+dims = [1 40];
+wells = inputdlg(prompt, dlgtitle, dims);
+s = str2double(wells); 
+if s > 1
+    prompt = {' Is there a specific range of images you would like to process? (y/n)'}; % Enter ExpID
+    dlgtitle = 'Range of Images';
+    dims = [1 40];
+    range_ans = inputdlg(prompt, dlgtitle, dims);
+    if strcmp(range_ans, 'y')
+      prompt = {'First Number in Range','Last Number in Range'};
+      dlgtitle = 'Range';
+      dims = [1 35];
+      answer = inputdlg(prompt,dlgtitle,dims);
+      for k = answer{1,1}: answer{2,1}
+          %filenames = dir(fullfile('C:\Users\Owner\OneDrive\Desktop\Stoll Fellowship Code\',ExpID_,'\_tu',convertCharsToStrings(k)));
+      positionLoad = strcat('C:\Users\Owner\OneDrive\Desktop\Stoll Fellowship Code\',ExpID_,'\tu', string(k), '_d0.tif');
+      positionLoad = dir(fullfile(positionLoad));
+      total_images = numel(positionLoad);
+      %load(positionLoad);
+      end
+    else 
+        prompt = {' Please enter images you would like to process as space separated numbers'}; % Enter ExpID
+        dlgtitle = 'Images';
+        dims = [1 40];
+        image_handles = inputdlg(prompt, dlgtitle, dims);
+        image_handles_num = str2num(image_handles{1});
+        for i = 1: length(image_handles_num)
+          positionLoad = strcat('C:\Users\Owner\OneDrive\Desktop\Stoll Fellowship Code\',ExpID_,'\tu',num2str((image_handles_num(1, i))), '_d0');
+          positionLoad = fullfile(positionLoad);
+         load(positionLoad);
+        end
+    end
+    
+end
+   
+
+% Saving the data 
+savename = strcat(outputfolder,'/',outputname,num2str(out),'.mat');
+    save(savename,'editedMask_cont', 'Max_area_thresh');
+
+
